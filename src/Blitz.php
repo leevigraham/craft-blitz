@@ -31,6 +31,7 @@ use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
+use craft\web\Application;
 use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
@@ -305,42 +306,44 @@ class Blitz extends Plugin
      */
     private function registerCacheableRequestEvents(): void
     {
-        Craft::$app->onInit(function() {
-            $this->cacheRequest->setDefaultCacheControlHeader();
+        // Register web application init event
+        Event::on(Application::class, Application::EVENT_INIT,
+            function() {
+                $this->cacheRequest->setDefaultCacheControlHeader();
 
-            if (!$this->cacheRequest->getIsCacheableRequest()) {
-                return;
+                if (!$this->cacheRequest->getIsCacheableRequest()) {
+                    return;
+                }
+
+                $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
+
+                if (!$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                    return;
+                }
+
+                $cachedResponse = $this->cacheRequest->getCachedResponse($siteUri);
+                if ($cachedResponse) {
+                    // Send the cached response and exit early, without allowing the full application life cycle to complete.
+                    $cachedResponse->send();
+                    exit();
+                }
+
+                if ($this->settings->cachingEnabled === false) {
+                    return;
+                }
+
+                $this->generateCache->registerElementPrepareEvents();
+
+                Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
+                    function(Event $event) use ($siteUri) {
+                        /** @var Response $response */
+                        $response = $event->sender;
+                        $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
+                    },
+                    // Prepend the event, so it is triggered as early as possible (before Craft Cloud gzips the response content, for example).
+                    append: false,
+                );
             }
-
-            $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
-
-            if (!$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-                return;
-            }
-
-            $cachedResponse = $this->cacheRequest->getCachedResponse($siteUri);
-            if ($cachedResponse) {
-                // Send the cached response and exit early, without allowing the full application life cycle to complete.
-                $cachedResponse->send();
-                exit();
-            }
-
-            if ($this->settings->cachingEnabled === false) {
-                return;
-            }
-
-            $this->generateCache->registerElementPrepareEvents();
-
-            Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-                function(Event $event) use ($siteUri) {
-                    /** @var Response $response */
-                    $response = $event->sender;
-                    $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
-                },
-                // Prepend the event, so it is triggered as early as possible (before Craft Cloud gzips the response content, for example).
-                append: false,
-            );
-        }
         );
     }
 
