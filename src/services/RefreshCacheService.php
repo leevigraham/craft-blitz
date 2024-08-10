@@ -36,10 +36,6 @@ use yii\db\ActiveQuery;
 
 /**
  * This class is responsible for keeping the cache fresh.
- * When one or more cacheable element are updated, they are added to the `$elements` array.
- * If `$batchMode` is false then the `refresh()` method is called immediately,
- * otherwise it is triggered by a resave event.
- * The `refresh()` method creates a `RefreshCacheJob` so that refreshing happens asynchronously.
  *
  * @property SiteUriModel[] $allSiteUris
  */
@@ -97,12 +93,12 @@ class RefreshCacheService extends Component
 
     /**
      * @var bool
-     * @deprecated since 5.7.0
+     * @deprecated in 5.7.0
      */
     public bool $batchMode = false;
 
     /**
-     * @var bool
+     * @var bool Whether the cache should be forcibly generated when refreshed.
      * @since 5.7.0
      */
     public bool $forceGenerate = false;

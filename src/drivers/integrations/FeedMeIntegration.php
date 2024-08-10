@@ -6,7 +6,7 @@
 namespace putyourlightson\blitz\drivers\integrations;
 
 /**
- * @deprecated since 5.7.0
+ * @deprecated in 5.7.0
  */
 class FeedMeIntegration extends BaseIntegration
 {
