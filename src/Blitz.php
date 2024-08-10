@@ -24,8 +24,6 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
-use craft\queue\jobs\ResaveElements;
-use craft\queue\Queue as CraftQueue;
 use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Plugins;
@@ -67,7 +65,6 @@ use yii\base\Event;
 use yii\di\Instance;
 use yii\log\Dispatcher;
 use yii\log\Logger;
-use yii\queue\ExecEvent;
 use yii\queue\Queue;
 
 /**
@@ -146,10 +143,14 @@ class Blitz extends Plugin
         $this->registerVariables();
         $this->registerLogTarget();
 
+        // Potentially refresh the cache at the end of every request
+        Craft::$app->onAfterRequest(function() {
+            $this->refreshCache->refresh();
+        });
+
         // Register events
         $this->registerCacheableRequestEvents();
         $this->registerElementEvents();
-        $this->registerResaveElementEvents();
         $this->registerStructureEvents();
         $this->registerIntegrationEvents();
         $this->registerHintsUtilityEvents();
@@ -305,7 +306,7 @@ class Blitz extends Plugin
      */
     private function registerCacheableRequestEvents(): void
     {
-        // Register application init event
+        // Register web application init event
         Event::on(Application::class, Application::EVENT_INIT,
             function() {
                 $this->cacheRequest->setDefaultCacheControlHeader();
@@ -402,57 +403,6 @@ class Blitz extends Plugin
                 }
             );
         }
-    }
-
-    /**
-     * Registers resave element events.
-     *
-     * Using Craft’s bulk operations events is not possible, since we need to track changes and the bulk operation can span multiple requests.
-     * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
-     */
-    private function registerResaveElementEvents(): void
-    {
-        // Enable batch mode
-        $events = [
-            [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
-            [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
-        ];
-        foreach ($events as $event) {
-            Event::on($event[0], $event[1],
-                function() {
-                    $this->refreshCache->batchMode = true;
-                }
-            );
-        }
-
-        Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->batchMode = true;
-                }
-            }
-        );
-
-        // Refresh the cache
-        $events = [
-            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
-            [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
-        ];
-        foreach ($events as $event) {
-            Event::on($event[0], $event[1],
-                function() {
-                    $this->refreshCache->refresh();
-                }
-            );
-        }
-
-        Event::on(CraftQueue::class, CraftQueue::EVENT_AFTER_EXEC_AND_RELEASE,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->refresh();
-                }
-            }
-        );
     }
 
     /**
