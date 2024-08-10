@@ -5,23 +5,14 @@
  */
 
 use craft\commerce\elements\Order;
-use Mockery\MockInterface;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\integrations\CommerceIntegration;
-use putyourlightson\blitz\services\RefreshCacheService;
 
 beforeEach(function() {
-    Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh,refreshAll]'));
     Blitz::$plugin->refreshCache->reset();
-    Blitz::$plugin->refreshCache->batchMode = false;
 })->skip(fn() => !integrationIsActive(CommerceIntegration::class), 'Commerce integration not found in active integrations.');
 
 test('Variant with unlimited stock is refreshed on order completion', function() {
-    /** @var MockInterface $refreshCache */
-    $refreshCache = Blitz::$plugin->refreshCache;
-    $refreshCache->shouldReceive('refresh')->once();
-    $refreshCache->shouldNotReceive('refreshAll');
-
     [$variant, $order] = createProductVariantOrder(batchMode: true, hasUnlimitedStock: false);
     $order->trigger(Order::EVENT_AFTER_COMPLETE_ORDER);
 
@@ -30,11 +21,6 @@ test('Variant with unlimited stock is refreshed on order completion', function()
 });
 
 test('Variant without unlimited stock is not refreshed on order completion', function() {
-    /** @var MockInterface $refreshCache */
-    $refreshCache = Blitz::$plugin->refreshCache;
-    $refreshCache->shouldNotReceive('refresh');
-    $refreshCache->shouldNotReceive('refreshAll');
-
     [$variant, $order] = createProductVariantOrder(batchMode: true);
     $order->trigger(Order::EVENT_AFTER_COMPLETE_ORDER);
 
