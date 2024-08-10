@@ -24,8 +24,6 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
-use craft\queue\jobs\ResaveElements;
-use craft\queue\Queue as CraftQueue;
 use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Plugins;
@@ -33,7 +31,6 @@ use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
-use craft\web\Application;
 use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
@@ -67,7 +64,6 @@ use yii\base\Event;
 use yii\di\Instance;
 use yii\log\Dispatcher;
 use yii\log\Logger;
-use yii\queue\ExecEvent;
 use yii\queue\Queue;
 
 /**
@@ -146,10 +142,14 @@ class Blitz extends Plugin
         $this->registerVariables();
         $this->registerLogTarget();
 
+        // Potentially refresh the cache at the end of every request
+        Craft::$app->onAfterRequest(function() {
+            $this->refreshCache->refresh();
+        });
+
         // Register events
         $this->registerCacheableRequestEvents();
         $this->registerElementEvents();
-        $this->registerResaveElementEvents();
         $this->registerStructureEvents();
         $this->registerIntegrationEvents();
         $this->registerHintsUtilityEvents();
@@ -305,44 +305,42 @@ class Blitz extends Plugin
      */
     private function registerCacheableRequestEvents(): void
     {
-        // Register application init event
-        Event::on(Application::class, Application::EVENT_INIT,
-            function() {
-                $this->cacheRequest->setDefaultCacheControlHeader();
+        Craft::$app->onInit(function() {
+            $this->cacheRequest->setDefaultCacheControlHeader();
 
-                if (!$this->cacheRequest->getIsCacheableRequest()) {
-                    return;
-                }
-
-                $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
-
-                if (!$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-                    return;
-                }
-
-                $cachedResponse = $this->cacheRequest->getCachedResponse($siteUri);
-                if ($cachedResponse) {
-                    // Send the cached response and exit early, without allowing the full application life cycle to complete.
-                    $cachedResponse->send();
-                    exit();
-                }
-
-                if ($this->settings->cachingEnabled === false) {
-                    return;
-                }
-
-                $this->generateCache->registerElementPrepareEvents();
-
-                Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-                    function(Event $event) use ($siteUri) {
-                        /** @var Response $response */
-                        $response = $event->sender;
-                        $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
-                    },
-                    // Prepend the event, so it is triggered as early as possible (before Craft Cloud gzips the response content, for example).
-                    append: false,
-                );
+            if (!$this->cacheRequest->getIsCacheableRequest()) {
+                return;
             }
+
+            $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
+
+            if (!$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                return;
+            }
+
+            $cachedResponse = $this->cacheRequest->getCachedResponse($siteUri);
+            if ($cachedResponse) {
+                // Send the cached response and exit early, without allowing the full application life cycle to complete.
+                $cachedResponse->send();
+                exit();
+            }
+
+            if ($this->settings->cachingEnabled === false) {
+                return;
+            }
+
+            $this->generateCache->registerElementPrepareEvents();
+
+            Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
+                function(Event $event) use ($siteUri) {
+                    /** @var Response $response */
+                    $response = $event->sender;
+                    $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
+                },
+                // Prepend the event, so it is triggered as early as possible (before Craft Cloud gzips the response content, for example).
+                append: false,
+            );
+        }
         );
     }
 
@@ -402,57 +400,6 @@ class Blitz extends Plugin
                 }
             );
         }
-    }
-
-    /**
-     * Registers resave element events.
-     *
-     * Using Craft’s bulk operations events is not possible, since we need to track changes and the bulk operation can span multiple requests.
-     * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
-     */
-    private function registerResaveElementEvents(): void
-    {
-        // Enable batch mode
-        $events = [
-            [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
-            [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
-        ];
-        foreach ($events as $event) {
-            Event::on($event[0], $event[1],
-                function() {
-                    $this->refreshCache->batchMode = true;
-                }
-            );
-        }
-
-        Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->batchMode = true;
-                }
-            }
-        );
-
-        // Refresh the cache
-        $events = [
-            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
-            [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
-        ];
-        foreach ($events as $event) {
-            Event::on($event[0], $event[1],
-                function() {
-                    $this->refreshCache->refresh();
-                }
-            );
-        }
-
-        Event::on(CraftQueue::class, CraftQueue::EVENT_AFTER_EXEC_AND_RELEASE,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->refresh();
-                }
-            }
-        );
     }
 
     /**
