@@ -1,5 +1,15 @@
 # Release Notes for Blitz
 
+## 4.23.0 - Unreleased
+
+### Added
+
+- Added the ability to create refresh cache jobs after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
+
+### Deprecated
+
+- Deprecated the `RefreshCacheService::batchMode` property.
+
 ## 4.22.0 - 2024-08-05
 
 > [!NOTE]
