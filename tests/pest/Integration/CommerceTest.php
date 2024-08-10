@@ -14,7 +14,7 @@ beforeEach(function() {
 })->skip(fn() => !integrationIsActive(CommerceIntegration::class), 'Commerce integration not found in active integrations.');
 
 test('Variant with inventory is refreshed on order completion', function() {
-    [$variant, $order] = createProductVariantOrder(batchMode: true, inventoryTracked: true);
+    [$variant, $order] = createProductVariantOrder(inventoryTracked: true);
     $order->trigger(Order::EVENT_AFTER_COMPLETE_ORDER);
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($variant::class))
@@ -23,7 +23,7 @@ test('Variant with inventory is refreshed on order completion', function() {
 
 test('Variant without inventory is not refreshed on order completion', function() {
     /** @var MockInterface $refreshCache */
-    [$variant, $order] = createProductVariantOrder(batchMode: true);
+    [$variant, $order] = createProductVariantOrder();
     $order->trigger(Order::EVENT_AFTER_COMPLETE_ORDER);
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($variant::class))

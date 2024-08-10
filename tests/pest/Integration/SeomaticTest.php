@@ -30,7 +30,7 @@ test('Invalidate container caches event without a URL or source triggers a refre
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldReceive('refreshAll')->once();
 
-    createEntry(batchMode: true);
+    createEntry();
     Seomatic::$plugin->metaContainers->invalidateCaches();
 });
 
@@ -39,7 +39,7 @@ test('Invalidate container caches event with a specific source triggers a refres
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldNotReceive('refreshAll');
 
-    $entry = createEntry(batchMode: true);
+    $entry = createEntry();
     Seomatic::$plugin->metaContainers->invalidateContainerCacheById($entry->sectionId, SeoEntry::getMetaBundleType(), $entry->siteId);
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($entry::class))
@@ -51,6 +51,6 @@ test('Invalidate container caches event for a specific element does not trigger 
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldNotReceive('refreshAll');
 
-    $entry = createEntry(batchMode: true);
+    $entry = createEntry();
     Seomatic::$plugin->metaContainers->invalidateContainerCacheByPath($entry->uri);
 });
