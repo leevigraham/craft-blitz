@@ -97,8 +97,15 @@ class RefreshCacheService extends Component
 
     /**
      * @var bool
+     * @deprecated since 5.7.0
      */
     public bool $batchMode = false;
+
+    /**
+     * @var bool
+     * @since 5.7.0
+     */
+    public bool $forceGenerate = false;
 
     /**
      * @var RefreshDataModel
@@ -215,11 +222,6 @@ class RefreshCacheService extends Component
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_ADD_ELEMENT)) {
             $this->trigger(self::EVENT_AFTER_ADD_ELEMENT, $event);
-        }
-
-        // If batch mode is on then the refresh will be triggered later
-        if ($this->batchMode === false) {
-            $this->refresh();
         }
     }
 
@@ -346,6 +348,8 @@ class RefreshCacheService extends Component
         if ($this->refreshData->isEmpty()) {
             return;
         }
+
+        $forceGenerate = $forceGenerate || $this->forceGenerate;
 
         $job = new RefreshCacheJob([
             'data' => $this->refreshData->data,
@@ -496,8 +500,6 @@ class RefreshCacheService extends Component
      */
     public function refreshExpiredCache(): void
     {
-        $this->batchMode = true;
-
         $cacheIds = Blitz::$plugin->expireCache->getExpiredCacheIds();
         $this->addCacheIds($cacheIds);
         $this->addExpiredElements();
@@ -512,11 +514,7 @@ class RefreshCacheService extends Component
      */
     public function refreshExpiredElements(): void
     {
-        $this->batchMode = true;
-
         $this->addExpiredElements();
-
-        $this->refresh();
     }
 
     /**
@@ -549,8 +547,6 @@ class RefreshCacheService extends Component
 
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
         $this->addCacheIds($cacheIds);
-
-        $this->refresh();
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE_TAGS)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE_TAGS, $event);
@@ -592,12 +588,10 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes the cache, forcibly generating the cache if it will not be cleared.
+     * Causes the cache to be forcibly generated if it will not be cleared.
      */
     private function forceRefresh(): void
     {
-        $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
-
-        $this->refresh(false, $forceGenerate);
+        $this->forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
     }
 }
