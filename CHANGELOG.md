@@ -4,12 +4,17 @@
 
 ### Added
 
+- Added the ability to create refresh cache jobs after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
 - Added compatibility for tracking of relation fields in Craft 5.3.0.
 - Added compatibility for detecting eager-loading opportunities in the Blitz Hints utility in Craft 5.3.0.
 
 ### Fixed
 
 - Fixed the nested element type count displayed in the Blitz Diagnostics utility.
+
+### Deprecated
+
+- Deprecated the `RefreshCacheService::batchMode` property.
 
 ## 5.6.2 - 2024-08-05
 
