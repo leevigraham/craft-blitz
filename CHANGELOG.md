@@ -8,10 +8,15 @@
 - Added compatibility for tracking of relation fields in Craft 5.3.0.
 - Added compatibility for detecting eager-loading opportunities in the Blitz Hints utility in Craft 5.3.0.
 
+### Changed
+
+- The expiry date displayed in the element sidebar panel now reflects the entry’s expiry date, if set and sooner than the cached page’s expiry date ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+
 ### Fixed
 
+<<<<<<< HEAD
 - Fixed the nested element type count displayed in the Blitz Diagnostics utility.
-- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
 
 ### Deprecated
 
