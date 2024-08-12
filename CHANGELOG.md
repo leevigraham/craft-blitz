@@ -6,6 +6,10 @@
 
 - Added the ability to create refresh cache jobs after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
 
+### Fixed
+
+- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+
 ### Deprecated
 
 - Deprecated the `RefreshCacheService::batchMode` property.
