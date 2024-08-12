@@ -12,7 +12,6 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\events\DefineElementEditorHtmlEvent;
 use craft\helpers\DateTimeHelper;
-use craft\helpers\Db;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
@@ -86,9 +85,16 @@ class ElementSidebarHelper
         $dateCached = $cacheRecord ? DateTimeHelper::toDateTime($cacheRecord->dateCached) : null;
         $expiryDate = $cacheRecord ? DateTimeHelper::toDateTime($cacheRecord->expiryDate) : null;
 
+        if (property_exists($element, 'expiryDate')) {
+            $elementExpiryDate = DateTimeHelper::toDateTime($element->expiryDate);
+            if ($elementExpiryDate) {
+                $expiryDate = $expiryDate ? min($elementExpiryDate, $expiryDate) : $elementExpiryDate;
+            }
+        }
+
         $html = Craft::$app->getView()->renderTemplate('blitz/_element-sidebar', [
             'cached' => !empty($cachedValue),
-            'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= Db::prepareDateForDb('now'),
+            'expired' => $expiryDate && $expiryDate <= DateTimeHelper::toDateTime('now'),
             'isCacheable' => Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri),
             'pageId' => $cacheRecord->id ?? null,
             'dateCached' => $dateCached,

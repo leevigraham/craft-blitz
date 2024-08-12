@@ -6,9 +6,13 @@
 
 - Added the ability to create refresh cache jobs after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
 
+### Changed
+
+- The expiry date displayed in the element sidebar panel now reflects the entry’s expiry date, if set and sooner than the cached page’s expiry date ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+
 ### Fixed
 
-- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
 
 ### Deprecated
 
