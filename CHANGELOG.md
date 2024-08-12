@@ -11,6 +11,7 @@
 ### Fixed
 
 - Fixed the nested element type count displayed in the Blitz Diagnostics utility.
+- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
 
 ### Deprecated
 
