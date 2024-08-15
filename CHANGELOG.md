@@ -4,7 +4,8 @@
 
 ### Added
 
-- Added the ability to create refresh cache jobs after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
+- Added the ability to create refresh cache jobs after every request has ended, meaning that setting the
+  `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
 - Added compatibility for tracking of relation fields in Craft 5.3.0.
 - Added compatibility for detecting eager-loading opportunities in the Blitz Hints utility in Craft 5.3.0.
 
@@ -20,6 +21,15 @@
 ### Deprecated
 
 - Deprecated the `RefreshCacheService::batchMode` property.
+
+## 5.6.3 - 2024-08-15
+
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes.
+
+### Fixed
+
+- Fixed an exception that could be thrown during updating when using MariaDB ([#693](https://github.com/putyourlightson/craft-blitz/issues/693)).
 
 ## 5.6.2 - 2024-08-05
 
@@ -42,13 +52,15 @@
 ### Added
 
 - Added a sidebar panel to element edit pages ([#690](https://github.com/putyourlightson/craft-blitz/issues/690)).
-- Added a `dateCached` column to cache records which is output in the sidebar panel and the Blitz Diagnostics utility.
+- Added a
+  `dateCached` column to cache records which is output in the sidebar panel and the Blitz Diagnostics utility.
 - Added the ability to track eager-loaded relation fields nested inside matrix blocks ([#657](https://github.com/putyourlightson/craft-blitz/issues/657)).
 - Added a structure view to tracked nested element pages in the Blitz Diagnostics utility.
 
 ### Changed
 
-- The `craft.blitz.csrfInput()`, `craft.blitz.csrfParam()` and `craft.blitz.csrfToken()` functions now output inline values rather than inject scripts when called via AJAX requests.
+- The `craft.blitz.csrfInput()`, `craft.blitz.csrfParam()` and
+  `craft.blitz.csrfToken()` functions now output inline values rather than inject scripts when called via AJAX requests.
 - The Commerce integration now only refreshes product variants if their inventory is tracked.
 
 ## 5.5.1 - 2024-07-23
@@ -101,7 +113,9 @@
 
 ### Fixed
 
-- Fixed a bug in which the priority of refresh cache and driver jobs was interpreted as `0` when set to `null` ([#655](https://github.com/putyourlightson/craft-blitz/issues/655)).
+- Fixed a bug in which the priority of refresh cache and driver jobs was interpreted as
+  `0` when set to
+  `null` ([#655](https://github.com/putyourlightson/craft-blitz/issues/655)).
 - Fixed an issue in which the priority of batch jobs could be a negative number and therefore jobs would never complete.
 
 ## 5.3.2 - 2024-06-18
@@ -139,7 +153,8 @@
 
 ### Fixed
 
-- Fixed the check for whether the `blitz/cache/refresh-expired` console command was executed within the past 24 hours.
+- Fixed the check for whether the
+  `blitz/cache/refresh-expired` console command was executed within the past 24 hours.
 - Fixed diagnostics notifications in the control panel.
 - Fixed the detection of lazy eager-loaded queries.
 - Fixed tracking of some element query attributes.
@@ -166,7 +181,8 @@
 
 ### Changed
 
-The `blitz/cache/refresh-cache-tags` and `blitz/cache/refresh-expired-elements` no longer forcibly generate the cache.
+The `blitz/cache/refresh-cache-tags` and
+`blitz/cache/refresh-expired-elements` no longer forcibly generate the cache.
 
 ## 5.1.3 - 2024-04-13
 
@@ -207,7 +223,8 @@ The `blitz/cache/refresh-cache-tags` and `blitz/cache/refresh-expired-elements` 
 ### Added
 
 - Added compatibility with Craft 5.
-- Added suggesting the use of the `eagerly()` function to lazy-loaded element queries in the Blitz Hints utility.
+- Added suggesting the use of the
+  `eagerly()` function to lazy-loaded element queries in the Blitz Hints utility.
 
 ### Changed
 
@@ -215,21 +232,34 @@ The `blitz/cache/refresh-cache-tags` and `blitz/cache/refresh-expired-elements` 
 
 ### Removed
 
-- Removed the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.
-- Removed the `craft.blitz.getUri()` template variable. Use `craft.blitz.fetchUri()` instead.
+- Removed the `craft.blitz.getTemplate()` template variable. Use
+  `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.
+- Removed the `craft.blitz.getUri()` template variable. Use
+  `craft.blitz.fetchUri()` instead.
 - Removed the `blitz/templates/get` controller action.
 - Removed the `cacheElements` config setting. Use `trackElements` instead.
-- Removed the `cacheElementQueries` config setting. Use `trackElementQueries` instead.
-- Removed the `craft.blitz.options.cacheElements()` template variable. Use `craft.blitz.options.trackElements()` instead.
-- Removed the `craft.blitz.options.cacheElementQueries()` template variable. Use `craft.blitz.options.trackElementQueries()` instead.
+- Removed the `cacheElementQueries` config setting. Use
+  `trackElementQueries` instead.
+- Removed the `craft.blitz.options.cacheElements()` template variable. Use
+  `craft.blitz.options.trackElements()` instead.
+- Removed the `craft.blitz.options.cacheElementQueries()` template variable. Use
+  `craft.blitz.options.trackElementQueries()` instead.
 - Removed the `createGzipFiles` setting.
 - Removed the `createBrotliFiles` setting.
-- Removed the `BlitzVariable::CACHED_INCLUDE_ACTION` constant. Use `CacheRequestService::CACHED_INCLUDE_ACTION` instead.
-- Removed the `BlitzVariable::DYNAMIC_INCLUDE_ACTION` constant. Use `CacheRequestService::DYNAMIC_INCLUDE_ACTION` instead.
+- Removed the `BlitzVariable::CACHED_INCLUDE_ACTION` constant. Use
+  `CacheRequestService::CACHED_INCLUDE_ACTION` instead.
+- Removed the `BlitzVariable::DYNAMIC_INCLUDE_ACTION` constant. Use
+  `CacheRequestService::DYNAMIC_INCLUDE_ACTION` instead.
 - Removed the `ElementTypeHelper::LIVE_STATUSES` constant.
-- Removed the `SettingsModel::clearOnRefresh` method. Use `SettingsModel::shouldClearOnRefresh` instead.
-- Removed the `SettingsModel::expireOnRefresh` method. Use `SettingsModel::shouldExpireOnRefresh` instead.
-- Removed the `SettingsModel::generateOnRefresh` method. Use `SettingsModel::shouldGenerateOnRefresh` instead.
-- Removed the `SettingsModel::purgeAfterRefresh` method. Use `SettingsModel::shouldPurgeAfterRefresh` instead.
-- Removed the `SettingsModel::generatePageBasedOnQueryString` method. Use `SettingsModel::shouldGeneratePageBasedOnQueryString` instead.
-- Removed the `SettingsModel::purgeAssetImages` method. Use `SettingsModel::shouldPurgeAssetImages` instead.
+- Removed the `SettingsModel::clearOnRefresh` method. Use
+  `SettingsModel::shouldClearOnRefresh` instead.
+- Removed the `SettingsModel::expireOnRefresh` method. Use
+  `SettingsModel::shouldExpireOnRefresh` instead.
+- Removed the `SettingsModel::generateOnRefresh` method. Use
+  `SettingsModel::shouldGenerateOnRefresh` instead.
+- Removed the `SettingsModel::purgeAfterRefresh` method. Use
+  `SettingsModel::shouldPurgeAfterRefresh` instead.
+- Removed the `SettingsModel::generatePageBasedOnQueryString` method. Use
+  `SettingsModel::shouldGeneratePageBasedOnQueryString` instead.
+- Removed the `SettingsModel::purgeAssetImages` method. Use
+  `SettingsModel::shouldPurgeAssetImages` instead.
