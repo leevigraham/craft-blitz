@@ -454,7 +454,7 @@ class ElementQueryHelper
         }
 
         /**
-         * Evaluate whether the element query has an owner.
+         * Evaluate whether the element query is for a specific field or owner.
          *
          * @see EntryQuery::beforePrepare()
          */

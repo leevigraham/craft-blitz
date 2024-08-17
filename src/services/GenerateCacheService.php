@@ -171,6 +171,7 @@ class GenerateCacheService extends Component
                                 ->status(null)
                                 ->offset(null)
                                 ->limit(null)
+                                ->eagerly()
                                 ->ids();
 
                             $this->generateData->addElementIds($elementIds);
