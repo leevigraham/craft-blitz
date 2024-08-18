@@ -83,6 +83,8 @@ class HintsService extends Component
                 return;
             }
 
+            $this->addFieldHint($elementQuery->fieldId ?? null);
+
             return;
         }
 
