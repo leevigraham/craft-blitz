@@ -4,9 +4,9 @@
 
 ### Added
 
-- Added the ability to create refresh cache jobs after every request has ended, meaning that setting the
+- Added a check for whether the cache should be refreshed after every request has ended, meaning that setting the
   `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
-- Added compatibility for detecting eager-loading opportunities in the Blitz Hints utility in Craft 5.3.0.
+- Added compatibility with Craft 5.3.0 for detecting eager-loading opportunities in the Blitz Hints utility.
 
 ### Changed
 
