@@ -443,8 +443,7 @@ class Blitz extends Plugin
             return;
         }
 
-        // Add the event listener without “appending”, so it triggers as early as possible.
-        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_PREPARE,
             function(CancelableEvent $event) {
                 /** @var ElementQuery $elementQuery */
                 $elementQuery = $event->sender;

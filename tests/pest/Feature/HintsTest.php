@@ -5,7 +5,6 @@
  */
 
 use craft\elements\db\ElementQuery;
-use craft\elements\Entry;
 use craft\events\CancelableEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\HintModel;
@@ -38,24 +37,8 @@ beforeEach(function() {
     );
 });
 
-test('Hint is recorded for a related element query that is lazy-loaded', function() {
-    Entry::find()->section('single')->one()->relatedTo->all();
-    Blitz::$plugin->hints->save();
-
-    expect(HintRecord::find()->count())
-        ->toBe(1);
-});
-
-test('Hint is not recorded for a related element query that is lazy eager-loaded', function() {
-    Entry::find()->section('single')->one()->relatedTo->eagerly()->all();
-    Blitz::$plugin->hints->save();
-
-    expect(HintRecord::find()->count())
-        ->toBe(0);
-});
-
 test('Hint is recorded for a matrix element query that is lazy-loaded', function() {
-    Entry::find()->section('single')->one()->matrix->all();
+    getSingleEntry()->matrix->all();
     Blitz::$plugin->hints->save();
 
     expect(HintRecord::find()->count())
@@ -63,7 +46,31 @@ test('Hint is recorded for a matrix element query that is lazy-loaded', function
 });
 
 test('Hint is not recorded for a matrix element query that is lazy eager-loaded', function() {
-    Entry::find()->section('single')->one()->matrix->eagerly()->all();
+    getSingleEntry()->matrix->eagerly()->all();
+    Blitz::$plugin->hints->save();
+
+    expect(HintRecord::find()->count())
+        ->toBe(0);
+});
+
+test('Hint is recorded for a related element query that is lazy-loaded', function() {
+    getSingleEntry()->relatedTo->all();
+    Blitz::$plugin->hints->save();
+
+    expect(HintRecord::find()->count())
+        ->toBe(1);
+});
+
+test('Hint is not recorded for a related element query that is lazy eager-loaded', function() {
+    getSingleEntry()->relatedTo->eagerly()->all();
+    Blitz::$plugin->hints->save();
+
+    expect(HintRecord::find()->count())
+        ->toBe(0);
+});
+
+test('Hint is not recorded for element queries with reference tags', function() {
+    getSingleEntry()->relatedTo->ref('xyz')->all();
     Blitz::$plugin->hints->save();
 
     expect(HintRecord::find()->count())

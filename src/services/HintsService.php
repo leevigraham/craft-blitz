@@ -137,8 +137,12 @@ class HintsService extends Component
     /**
      * Adds a field hint. As of Craft 5.3.0, we may not be able to detect the field ID from the element query, if the relation field value is stored in the `content` column. In this case we set a field ID of zero, so we can still store it, maintaining unique keys.
      */
-    private function addFieldHint(?int $fieldId = null): void
+    private function addFieldHint(array|int|null $fieldId = null): void
     {
+        if (is_array($fieldId)) {
+            $fieldId = $fieldId[0] ?? null;
+        }
+
         $fieldId = $fieldId ?? 0;
         $fieldHandle = null;
 

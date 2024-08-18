@@ -39,6 +39,11 @@ function getChannelSectionId(): int
     return Craft::$app->entries->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'))->id;
 }
 
+function getSingleEntry(): Entry|null
+{
+    return Entry::find()->section('single')->one();
+}
+
 function integrationIsActive(string $class): bool
 {
     return in_array($class, IntegrationHelper::getActiveIntegrations());
