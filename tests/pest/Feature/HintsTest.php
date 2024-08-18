@@ -53,7 +53,7 @@ test('Hint is not recorded for a matrix element query that is lazy eager-loaded'
         ->toBe(0);
 });
 
-test('Hint is recorded for a related element query that is lazy-loaded', function() {
+test('Hint is recorded for a related entry query that is lazy-loaded', function() {
     getSingleEntry()->relatedTo->all();
     Blitz::$plugin->hints->save();
 
@@ -61,8 +61,24 @@ test('Hint is recorded for a related element query that is lazy-loaded', functio
         ->toBe(1);
 });
 
-test('Hint is not recorded for a related element query that is lazy eager-loaded', function() {
+test('Hint is not recorded for a related entry query that is lazy eager-loaded', function() {
     getSingleEntry()->relatedTo->eagerly()->all();
+    Blitz::$plugin->hints->save();
+
+    expect(HintRecord::find()->count())
+        ->toBe(0);
+});
+
+test('Hint is recorded for a related category query that is lazy-loaded', function() {
+    getSingleEntry()->categories->all();
+    Blitz::$plugin->hints->save();
+
+    expect(HintRecord::find()->count())
+        ->toBe(1);
+});
+
+test('Hint is not recorded for a related category query that is lazy eager-loaded', function() {
+    getSingleEntry()->categories->eagerly()->all();
     Blitz::$plugin->hints->save();
 
     expect(HintRecord::find()->count())
