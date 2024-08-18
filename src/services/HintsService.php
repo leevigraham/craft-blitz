@@ -11,6 +11,7 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use craft\base\Element;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\services\Elements;
@@ -138,7 +139,14 @@ class HintsService extends Component
         foreach ($traces as $trace) {
             $class = $trace['class'] ?? null;
             $function = $trace['function'] ?? null;
+
+            // Detect eager-loading of matrix fields.
             if ($class === Elements::class && $function === 'eagerLoadElements') {
+                return true;
+            }
+
+            // Detect eager-loading of relation fields.
+            if ($class === Element::class && $function === 'getFieldValue') {
                 return true;
             }
         }
