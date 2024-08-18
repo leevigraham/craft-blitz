@@ -51,7 +51,7 @@ test('Hint is not recorded for a related element query that is lazy eager-loaded
     Blitz::$plugin->hints->save();
 
     expect(HintRecord::find()->count())
-        ->toEqual(0);
+        ->toBe(0);
 });
 
 test('Hint is recorded for a matrix element query that is lazy-loaded', function() {
@@ -67,5 +67,5 @@ test('Hint is not recorded for a matrix element query that is lazy eager-loaded'
     Blitz::$plugin->hints->save();
 
     expect(HintRecord::find()->count())
-        ->toEqual(0);
+        ->toBe(0);
 });

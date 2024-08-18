@@ -153,11 +153,12 @@ class Blitz extends Plugin
         $this->registerElementEvents();
         $this->registerStructureEvents();
         $this->registerIntegrationEvents();
-        $this->registerHintsUtilityEvents();
         $this->registerClearCaches();
 
-        // Register control panel events
-        if (Craft::$app->getRequest()->getIsCpRequest()) {
+        // Register site and control panel events
+        if (Craft::$app->getRequest()->getIsSiteRequest()) {
+            $this->registerHintsUtilityEvents();
+        } else {
             $this->registerCpUrlRules();
             $this->registerUtilities();
             $this->registerWidgets();
@@ -438,11 +439,6 @@ class Blitz extends Plugin
      */
     private function registerHintsUtilityEvents(): void
     {
-        // Ignore CP requests.
-        if (Craft::$app->getRequest()->getIsCpRequest()) {
-            return;
-        }
-
         if (!$this->settings->hintsEnabled) {
             return;
         }
