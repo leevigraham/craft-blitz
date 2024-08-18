@@ -64,7 +64,7 @@ class HintsService extends Component
 
         if (ElementQueryHelper::isNestedEntryQuery($elementQuery)) {
             /** @var EntryQuery $elementQuery */
-            if (!ElementQueryHelper::hasRelatedElementIds($elementQuery)) {
+            if (!ElementQueryHelper::hasNumericElementIds($elementQuery)) {
                 $this->addFieldHint($elementQuery->fieldId);
             }
 
@@ -72,8 +72,11 @@ class HintsService extends Component
         }
 
         // Required as of Craft 5.3.0.
-        if (ElementQueryHelper::hasRelatedElementIds($elementQuery)) {
-            $this->addFieldHint($elementQuery->fieldId ?? null);
+        if (ElementQueryHelper::hasNumericElementIds($elementQuery)) {
+            // Eager-loaded element queries are executed with `asArray` set to `true`.
+            if ($elementQuery->asArray === false) {
+                $this->addFieldHint($elementQuery->fieldId ?? null);
+            }
 
             return;
         }
