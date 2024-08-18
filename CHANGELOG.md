@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added the ability to create refresh cache jobs after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
+- Added a check for whether the cache should be refreshed after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
 
 ### Changed
 
