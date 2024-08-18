@@ -13,6 +13,7 @@ use Craft;
 use craft\base\Component;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
+use craft\services\Elements;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\models\HintModel;
 use putyourlightson\blitz\records\HintRecord;
@@ -78,8 +79,7 @@ class HintsService extends Component
                 return;
             }
 
-            // Exclude reference tags.
-            if ($elementQuery->ref !== null) {
+            if ($this->isParsingReferenceTags($elementQuery)) {
                 return;
             }
 
@@ -132,6 +132,28 @@ class HintsService extends Component
         }
 
         $this->hints = [];
+    }
+
+    /**
+     * Returns whether the element query is parsing reference tags.
+     */
+    private function isParsingReferenceTags(ElementQuery $elementQuery): bool
+    {
+        if ($elementQuery->ref !== null) {
+            return true;
+        }
+
+        // If the reference tag was an ID then the `ref` property will not be set, so we need to check the stack trace for the presence of `Elements::parseRefs()`.
+        $traces = debug_backtrace();
+        foreach ($traces as $trace) {
+            $class = $trace['class'] ?? null;
+            $function = $trace['function'] ?? null;
+            if ($class === Elements::class && $function === 'parseRefs') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

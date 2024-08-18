@@ -70,7 +70,15 @@ test('Hint is not recorded for a related element query that is lazy eager-loaded
 });
 
 test('Hint is not recorded for element queries with reference tags', function() {
-    getSingleEntry()->relatedTo->ref('xyz')->all();
+    getSingleEntry()->relatedTo->ref('{entry:1@1:url}')->all();
+    Blitz::$plugin->hints->save();
+
+    expect(HintRecord::find()->count())
+        ->toBe(0);
+});
+
+test('Hint is not recorded for parsed reference tags', function() {
+    Craft::$app->getElements()->parseRefs('{entry:1@1:url}');
     Blitz::$plugin->hints->save();
 
     expect(HintRecord::find()->count())
