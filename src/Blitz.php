@@ -443,7 +443,7 @@ class Blitz extends Plugin
             return;
         }
 
-        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_PREPARE,
+        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
             function(CancelableEvent $event) {
                 /** @var ElementQuery $elementQuery */
                 $elementQuery = $event->sender;

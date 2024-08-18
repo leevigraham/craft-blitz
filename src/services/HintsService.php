@@ -59,7 +59,7 @@ class HintsService extends Component
             return;
         }
 
-        if ($elementQuery->eagerly || $elementQuery->wasEagerLoaded()) {
+        if ($this->isEagerLoading($elementQuery) || $this->isParsingReferenceTags($elementQuery)) {
             return;
         }
 
@@ -74,15 +74,6 @@ class HintsService extends Component
 
         // Required as of Craft 5.3.0.
         if (ElementQueryHelper::hasNumericElementIds($elementQuery)) {
-            // Eager-loaded element queries are executed with `asArray` set to `true`.
-            if ($elementQuery->asArray === true) {
-                return;
-            }
-
-            if ($this->isParsingReferenceTags($elementQuery)) {
-                return;
-            }
-
             $this->addFieldHint($elementQuery->fieldId ?? null);
 
             return;
@@ -132,6 +123,27 @@ class HintsService extends Component
         }
 
         $this->hints = [];
+    }
+
+    /**
+     * Returns whether the element query is being eager-loaded.
+     */
+    private function isEagerLoading(ElementQuery $elementQuery): bool
+    {
+        if ($elementQuery->eagerly || $elementQuery->wasEagerLoaded()) {
+            return true;
+        }
+
+        $traces = debug_backtrace();
+        foreach ($traces as $trace) {
+            $class = $trace['class'] ?? null;
+            $function = $trace['function'] ?? null;
+            if ($class === Elements::class && $function === 'eagerLoadElements') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
