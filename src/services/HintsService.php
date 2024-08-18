@@ -13,7 +13,6 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\elements\db\ElementQuery;
-use craft\elements\db\EntryQuery;
 use craft\services\Elements;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\models\HintModel;
@@ -65,10 +64,7 @@ class HintsService extends Component
         }
 
         if (ElementQueryHelper::isNestedEntryQuery($elementQuery)) {
-            /** @var EntryQuery $elementQuery */
-            if (!ElementQueryHelper::hasNumericElementIds($elementQuery)) {
-                $this->addFieldHint($elementQuery->fieldId);
-            }
+            $this->addFieldHint($elementQuery->fieldId ?? null);
 
             return;
         }
