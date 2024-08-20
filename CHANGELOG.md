@@ -2,10 +2,13 @@
 
 ## 5.7.0 - Unreleased
 
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes.
+
 ### Added
 
 - Added a check for whether the cache should be refreshed after every request has ended, meaning that setting the
-  `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
+  `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed.
 - Added compatibility with Craft 5.3.0 for detecting eager-loading opportunities in the Blitz Hints utility.
 
 ### Changed
@@ -16,6 +19,7 @@
 
 - Fixed the nested element type count displayed in the Blitz Diagnostics utility.
 - Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Fixed a bug that was causing integrity constraint violation errors to be logged ([#699](https://github.com/putyourlightson/craft-blitz/issues/699)).
 
 ### Deprecated
 
