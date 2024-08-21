@@ -13,6 +13,7 @@
 ### Fixed
 
 - Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Fixed a bug in which the homepage was not being displayed as cached in the element sidebar panel.
 
 ### Deprecated
 

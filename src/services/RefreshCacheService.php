@@ -93,7 +93,7 @@ class RefreshCacheService extends Component
 
     /**
      * @var bool
-     * @deprecated in 5.7.0
+     * @deprecated in 4.23.0
      */
     public bool $batchMode = false;
 
